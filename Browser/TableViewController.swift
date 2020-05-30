@@ -9,6 +9,8 @@
 import UIKit
 
 class TableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+    
+    // MARK: - Setup Variables
     var managerOfMarkers: ManagerOfMarkers!
     
     var header: UILabel = {
@@ -34,6 +36,9 @@ class TableViewController: UIViewController, UITableViewDelegate, UITableViewDat
 
     @IBOutlet weak var tableView: UITableView!
     
+    
+    
+    // MARK: - ViewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tableView.delegate = self
@@ -46,6 +51,9 @@ class TableViewController: UIViewController, UITableViewDelegate, UITableViewDat
         tableView.reloadData()
     }
     
+    
+    
+    // MARK: - Setup Layout
     func setupHeaderAndButtonLayout() {
         view.addSubview(header)
         NSLayoutConstraint.activate([
@@ -60,6 +68,9 @@ class TableViewController: UIViewController, UITableViewDelegate, UITableViewDat
         ])
     }
     
+    
+    
+    // MARK: - UITableViewDataSource
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return managerOfMarkers.markersCount
     }
@@ -73,6 +84,9 @@ class TableViewController: UIViewController, UITableViewDelegate, UITableViewDat
         return UITableViewCell()
     }
     
+    
+    
+    // MARK: - Navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         guard segue.identifier == "unwindToMainScreen" else { return }
         guard let webVC = segue.destination as? ViewController else { return }

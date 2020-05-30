@@ -9,6 +9,8 @@
 import UIKit
 import WebKit
 class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UITextFieldDelegate {
+    
+    // MARK: - Setup Variables
     var managerOfMarkers: ManagerOfMarkers!
     
     @IBOutlet weak var webView: WKWebView!
@@ -20,6 +22,9 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UITe
         return actInd
     }()
     
+    
+    
+    // MARK: - ViewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
         managerOfMarkers = ManagerOfMarkers()
@@ -36,6 +41,9 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UITe
         seatchField.reloadInputViews()
     }
     
+    
+    
+    // MARK: - Setup Refresh Layout
     func setupRefreshLayout() {
         view.addSubview(actInd)
         actInd.hidesWhenStopped = true
@@ -43,19 +51,21 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UITe
         actInd.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
     }
     
-    @IBAction func save() {
-        guard let currentURL = webView.url else { return }
-        managerOfMarkers.add(marker: Marker(text: "\(currentURL)"))
+    
+    
+    // MARK: - Navigation
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        guard segue.identifier == "goToMarkers" else { return }
+        guard let markersVC = segue.destination as? TableViewController else { return }
+        markersVC.managerOfMarkers = managerOfMarkers
     }
     
-    @IBAction func seatchButton() {
+    @IBAction func unwindToMainScreen(_ unwindSegue: UIStoryboardSegue) {
         setupURL(seatch: seatchField.text!)
-//        if let text = seatchField.text {
-//            if let seatch = URL(string: text) {
-//                let field = URLRequest(url: seatch)
-//                webView.load(field)
-//            }
-//        }
+    }
+    
+    @IBAction func markers() {
+        performSegue(withIdentifier: "goToMarkers", sender: nil)
     }
     
     @IBAction func goBackButton() {
@@ -74,8 +84,14 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UITe
         self.seatchField.text = "\(currentURL))"
     }
     
-    @IBAction func markers() {
-        performSegue(withIdentifier: "goToMarkers", sender: nil)
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        setupURL(seatch: seatchField.text!)
+        seatchField.resignFirstResponder()
+        return true
+    }
+    
+    @IBAction func seatchButton() {
+        setupURL(seatch: seatchField.text!)
     }
     
     func setupURL(seatch: String) {
@@ -84,14 +100,12 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UITe
         self.webView.load(request)
     }
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        guard segue.identifier == "goToMarkers" else { return }
-        guard let markersVC = segue.destination as? TableViewController else { return }
-        markersVC.managerOfMarkers = managerOfMarkers
-    }
     
-    @IBAction func unwindToMainScreen(_ unwindSegue: UIStoryboardSegue) {
-        setupURL(seatch: seatchField.text!)
+    
+    // MARK: - Work whith URL and UIActivityIndicatorView
+    @IBAction func save() {
+        guard let currentURL = webView.url else { return }
+        managerOfMarkers.add(marker: Marker(text: "\(currentURL)"))
     }
     
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
@@ -100,12 +114,6 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UITe
         decisionHandler(.allow)
     }
     
-    
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        setupURL(seatch: seatchField.text!)
-        seatchField.resignFirstResponder()
-        return true
-    }
     func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
         actInd.startAnimating()
     }
@@ -117,7 +125,7 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UITe
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         actInd.stopAnimating()
     }
-    
+
 }
 
 
